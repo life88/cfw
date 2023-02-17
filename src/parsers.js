@@ -15,10 +15,10 @@ module.exports.parse1 = async (raw, {axios, yaml, notify, console}, {name, url, 
 
 // 清除服务商的 groups、rules 配置
 module.exports.parse2 = (raw, { yaml }) => {
-  const rawObj = yaml.parse(raw)
-  const groups = []
-  const rules = []
-  return yaml.stringify({ ...rawObj, 'proxy-groups': groups, rules })
+  const rawObj = yaml.parse(raw);
+  const groups = [];
+  const rules = [];
+  return yaml.stringify({ ...rawObj, 'proxy-groups': groups, rules });
 }
 
 // * 通用解析函数
