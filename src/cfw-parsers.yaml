@@ -1,37 +1,4 @@
 parsers:  # array
-  - reg: ^https://apiv1\.v27qae\.com/.+$
-    code: |
-      module.exports.parse = async (raw, {axios, yaml, notify, console}, {name, url, interval, selected}) => {
-        const obj = yaml.parse(raw);
-        const proxyGroups = obj['proxy-groups'];
-        const idx = proxyGroups.findIndex(({ name }) => name === '国外流量');
-        if(idx > -1){
-          const target = proxyGroups[idx];
-          target.type = 'url-test';
-          target.url = 'http://www.gstatic.com/generate_204';
-          target.interval = 600;
-          // proxyGroups.splice(idx, 1, target);
-        }
-        return yaml.stringify(obj);
-      }
-    yaml:
-      commands:
-        - proxy-groups.国外流量.proxies.直接连接-
-
-  - reg: ^https://get\.cloudv2\.net/clash\.php.+$
-    yaml:
-      append-proxy-groups:
-        - name: 自动选择
-          type: url-test
-          url: http://www.gstatic.com/generate_204
-          interval: 600
-          proxies:
-
-      commands:
-        - proxy-groups.自动选择.proxies=[]proxyNames  # 向自定义策略组添加所有定义的节点名称
-        - proxy-groups.0.proxies.0+自动选择
-
-
   # 只需要这一个就够了
   - reg: ^.*$   # 匹配所有订阅
     code: |
@@ -49,10 +16,16 @@ parsers:  # array
             - 绕过大陆丨黑名单(GFWList) # 黑名单模式，意为「只有命中规则的网络流量，才使用代理」
             - 绕过大陆丨白名单(WhiteList) # 白名单模式，意为「没有命中规则的网络流量，统统使用代理」
 
-        - name: 🔰 选择节点
+        - name: 🔰 自动选择节点
           type: url-test
           url: http://www.gstatic.com/generate_204
           interval: 86400
+
+        - name: 🔰 手动选择节点
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 86400
+
 
         - name: 🛑 广告拦截
           type: select
@@ -80,22 +53,25 @@ parsers:  # array
           url: http://www.gstatic.com/generate_204
           interval: 86400
           proxies:
-            - 🔰 选择节点
+            - 🔰 自动选择节点
+            - 🔰 手动选择节点
 
-        # 策略组示例
-          # - name: 分组名
-            # type: select       # 手动选点
+              # 策略组示例
+              # - name: 分组名
+              # type: select       # 手动选点
               # url-test     # 自动选择延迟最低的节点
               # fallback     # 节点故障时自动切换下一个
-              # laod-balance # 均衡使用分组内的节点
+            # laod-balance # 均衡使用分组内的节点
             # url: http://www.gstatic.com/generate_204 # 测试地址 非select类型分组必要
             # interval: 300 # 自动测试间隔时间，单位秒 非select类型分组必要
             # tolerance: 50 # 允许的偏差，节点之间延迟差小于该值不切换 非必要
             # proxies:
             # - 节点名称或其他分组套娃
       commands:
-        - proxy-groups.🔰 选择节点.proxies=[]proxyNames  # 向指定策略组添加订阅中的节点名，可使用正则过滤
-        - proxy-groups.🔰 选择节点.0+DIRECT  # 向指定分组第一个位置添加一个 DIRECT 节点名
+        - proxy-groups.🔰 自动选择节点.proxies=[]proxyNames  # 向指定策略组添加订阅中的节点名，可使用正则过滤
+        - proxy-groups.🔰 自动选择节点.0+DIRECT  # 向指定分组第一个位置添加一个 DIRECT 节点名
+        - proxy-groups.🔰 手动选择节点.proxies=[]proxyNames
+        - proxy-groups.🔰 手动选择节点.0+DIRECT
         # 一些可能用到的正则过滤节点示例，使分组更细致
         # []proxyNames|a                         # 包含a
         # []proxyNames|^(.*)(a|b)+(.*)$          # 包含a或b
@@ -224,4 +200,3 @@ parsers:  # array
           url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
           path: ./ruleset/applications.yaml
           interval: 86400
-
