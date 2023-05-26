@@ -49,7 +49,7 @@ parsers:  # array
             - PROXY
 
         - name: PROXY
-          type: url-test
+          type: select
           url: http://www.gstatic.com/generate_204
           interval: 86400
           proxies:
